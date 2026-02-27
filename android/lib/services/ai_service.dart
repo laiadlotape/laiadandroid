@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../models/message.dart';
 import '../config/app_config.dart';
@@ -43,6 +44,55 @@ class AIService {
       throw Exception('API key inválida. Ve a Ajustes para configurarla.');
     } else {
       throw Exception('Error ${response.statusCode}: ${response.body}');
+    }
+  }
+
+  Stream<String> chatStream(List<Message> messages) async* {
+    final request = http.Request(
+      'POST',
+      Uri.parse('$apiBase/chat/completions'),
+    );
+    request.headers.addAll({
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+      if (provider == 'openrouter')
+        'HTTP-Referer': 'https://github.com/laiadlotape/laiadandroid',
+    });
+    request.body = jsonEncode({
+      'model': model,
+      'messages': messages.map((m) => m.toJson()).toList(),
+      'max_tokens': 2048,
+      'stream': true,
+    });
+
+    final client = http.Client();
+    try {
+      final response = await client.send(request);
+      if (response.statusCode != 200) {
+        throw Exception('Error ${response.statusCode}: ${response.reasonPhrase}');
+      }
+
+      await for (final chunk in response.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())) {
+        if (chunk.startsWith('data: ')) {
+          final data = chunk.substring(6);
+          if (data == '[DONE]') break;
+          try {
+            final json = jsonDecode(data);
+            final delta = json['choices'][0]['delta']['content'];
+            if (delta != null) {
+              yield delta as String;
+            }
+          } catch (_) {
+            // Ignore parse errors
+          }
+        }
+      }
+    } catch (e) {
+      throw Exception('Streaming error: $e');
+    } finally {
+      client.close();
     }
   }
 }

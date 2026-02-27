@@ -140,6 +140,7 @@ class LaiaConfigurator(Gtk.Window):
         vbox.pack_start(notebook, True, True, 0)
 
         # Tabs
+        notebook.append_page(self._build_ai_keys_tab(),  Gtk.Label(label="🤖 AI Keys"))
         notebook.append_page(self._build_openclaw_tab(), Gtk.Label(label="🔒 OpenClaw"))
         notebook.append_page(self._build_system_tab(),   Gtk.Label(label="🛡️ System"))
         notebook.append_page(self._build_status_tab(),   Gtk.Label(label="📊 Status"))
@@ -169,6 +170,121 @@ class LaiaConfigurator(Gtk.Window):
 
         self.connect("destroy", Gtk.main_quit)
         self._load_config()
+
+    # ------------------------------------------------------------------
+    # TAB: AI Keys & Provider Configuration
+    # ------------------------------------------------------------------
+    def _build_ai_keys_tab(self):
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, border_width=20)
+        scrolled.add(vbox)
+
+        # Title
+        title = Gtk.Label()
+        title.set_markup("<b>AI Configuration</b>")
+        title.set_xalign(0)
+        vbox.pack_start(title, False, False, 0)
+
+        # Load current config
+        keys_file = Path.home() / ".laia" / "api_keys.env"
+        mode = "online"
+        provider = "groq"
+        
+        if keys_file.exists():
+            with open(keys_file) as f:
+                for line in f:
+                    if line.startswith("LAIA_MODE="):
+                        mode = line.split("=", 1)[1].strip()
+                    elif line.startswith("LAIA_PROVIDER="):
+                        provider = line.split("=", 1)[1].strip()
+
+        # Mode selection
+        mode_label = Gtk.Label(label="Current Mode:", xalign=0)
+        mode_label.set_markup("<b>Current Mode:</b>")
+        vbox.pack_start(mode_label, False, False, 0)
+
+        mode_badge = Gtk.Label()
+        if mode == "online":
+            mode_badge.set_markup("☁️  <b>Online Free</b> — Using free cloud API")
+        elif mode == "local":
+            mode_badge.set_markup("🖥️  <b>Local</b> — Running Ollama on this machine")
+        else:
+            mode_badge.set_markup("🌐  <b>LAN Remote</b> — Connected to remote Ollama")
+        mode_badge.set_xalign(0)
+        vbox.pack_start(mode_badge, False, False, 0)
+
+        change_mode_btn = Gtk.Button(label="Change AI Mode")
+        change_mode_btn.connect("clicked", lambda b: subprocess.run(
+            ["bash", str(Path("/opt/laia/scripts/setup-ai-provider.sh"))],
+            check=False
+        ))
+        vbox.pack_start(change_mode_btn, False, False, 0)
+
+        vbox.pack_start(Gtk.Separator(), False, False, 0)
+
+        # API Keys (only for online mode)
+        if mode == "online":
+            keys_title = Gtk.Label()
+            keys_title.set_markup("<b>API Keys</b>")
+            keys_title.set_xalign(0)
+            vbox.pack_start(keys_title, False, False, 0)
+
+            key_info = Gtk.Label()
+            key_info.set_markup(f"Provider: <b>{provider}</b>\nKeys are stored securely in ~/.laia/api_keys.env")
+            key_info.set_xalign(0)
+            key_info.set_line_wrap(True)
+            vbox.pack_start(key_info, False, False, 0)
+
+            test_btn = Gtk.Button(label="🧪 Test Connection")
+            test_btn.connect("clicked", lambda b: self._test_ai_connection())
+            vbox.pack_start(test_btn, False, False, 0)
+
+            edit_btn = Gtk.Button(label="✏️  Edit API Key")
+            edit_btn.connect("clicked", lambda b: subprocess.run(
+                ["xdg-open", str(keys_file)],
+                check=False
+            ))
+            vbox.pack_start(edit_btn, False, False, 0)
+
+        vbox.pack_start(Gtk.Label(), True, True, 0)  # Filler
+
+        return scrolled
+
+    def _test_ai_connection(self):
+        """Test the current AI connection in a separate thread."""
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.OK,
+            text="Testing connection..."
+        )
+        dialog.format_secondary_text("Running: bash /opt/laia/scripts/test-connection.sh")
+        dialog.show()
+
+        def run_test():
+            try:
+                result = subprocess.run(
+                    ["bash", "/opt/laia/scripts/test-connection.sh"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                msg = result.stdout.strip() if result.returncode == 0 else result.stderr.strip()
+                GLib.idle_add(lambda: self._show_test_result(dialog, msg, result.returncode))
+            except Exception as e:
+                GLib.idle_add(lambda: self._show_test_result(dialog, str(e), 1))
+
+        thread = threading.Thread(target=run_test, daemon=True)
+        thread.start()
+
+    def _show_test_result(self, dialog, message, returncode):
+        dialog.set_property("text", "Test Result")
+        dialog.format_secondary_text(message)
+        dialog.run()
+        dialog.destroy()
 
     # ------------------------------------------------------------------
     # TAB: OpenClaw Settings

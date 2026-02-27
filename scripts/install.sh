@@ -49,10 +49,18 @@ section "4/5 OpenClaw (restricted mode)"
 bash "$LAIA_DIR/config/openclaw/setup-restricted.sh"
 
 if [[ "$NO_AI" == "false" ]]; then
-  section "5/5 AI stack (Ollama + OpenWebUI)"
-  bash "$LAIA_DIR/config/ai/install-ai-stack.sh"
+  section "5/5 LAIA AI Setup"
+  echo ""
+  echo "LAIA supports three AI modes:"
+  echo "  ☁️  Online Free  — Free API key (Groq, OpenRouter, etc.) — ready in 30s"
+  echo "  🖥️  Local        — Ollama running on this machine"
+  echo "  🌐  LAN Remote   — Ollama on another machine"
+  echo ""
+  echo "Online Free is recommended — no hardware requirements, instant setup."
+  echo ""
+  bash "$LAIA_DIR/scripts/setup-ai-provider.sh"
 else
-  section "5/5 Skipping AI stack (--no-ai)"
+  section "5/5 Skipping AI setup (--no-ai)"
 fi
 
 if [[ "$NO_GUI" == "false" ]]; then

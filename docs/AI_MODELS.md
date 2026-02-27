@@ -1,159 +1,177 @@
-# LAIA AI Models Guide
+# AI Models & Providers Guide
 
-## Overview
+LAIA supports three AI modes. Choose one based on your needs.
 
-LAIA uses [Ollama](https://ollama.com) to run AI models locally on your computer.
-**Your data never leaves your device** — no cloud, no subscription, no tracking.
+## ☁️ Online Free Models
 
-All models listed here are free and open-source.
+Free cloud APIs with no hardware requirements. Get running in 30 seconds.
 
----
+### Groq (⭐ Recommended)
 
-## Pre-installed Models (Default)
-
-These are installed automatically based on your hardware during setup:
-
-| Model | Download Size | RAM Required | Best For |
-|-------|--------------|--------------|---------|
-| Gemma 3 (1B) | ~0.8 GB | 2 GB | Ultra-fast, basic tasks |
-| Gemma 3 (4B) | ~2.5 GB | 4 GB | Fast general use, vision |
-| Phi-4 Mini | ~2.5 GB | 4 GB | Coding, reasoning |
-| Llama 3.2 (3B) | ~2.0 GB | 3 GB | General, balanced |
-
----
-
-## Installing More Models
-
-Open a terminal and use `ollama pull`:
+**Speed:** 300–560 tokens/sec (fastest free tier)  
+**Setup:** 30 seconds  
+**Models:** Llama 3.1 8B/70B, Gemma 2 9B, Mixtral 8x7B  
 
 ```bash
-# Reasoning models
-ollama pull deepseek-r1:7b       # Best open reasoning model (7B)
-ollama pull deepseek-r1:8b       # Llama-based R1 variant
-
-# Coding models
-ollama pull qwen2.5-coder:7b     # Best coding model at 7B
-ollama pull qwen2.5-coder:3b     # Smaller coding model (lower RAM)
-
-# General models
-ollama pull mistral:7b           # Mistral 7B — solid all-rounder
-ollama pull qwen3:4b             # Qwen 3 with thinking mode (Oct 2025)
-ollama pull qwen3:8b             # Qwen 3 mid-range with thinking
-ollama pull gemma3:12b           # Google's 12B with vision support
-
-# High-end (32GB+ RAM or GPU)
-ollama pull gemma3:27b           # Google's best Gemma with vision
-ollama pull llama3.3:70b         # Near state-of-the-art open model
-ollama pull deepseek-r1:70b      # Best open reasoning, approaches o3
+# Get API key at: https://console.groq.com
+curl -X POST https://api.groq.com/openai/v1/chat/completions \
+  -H "Authorization: Bearer $GROQ_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama-3.1-8b-instant",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 100
+  }'
 ```
 
----
+### OpenRouter
 
-## Hardware Guide
+**Models:** 200+ free models (Llama, Phi, Gemma, Mistral, DeepSeek R1)  
+**Setup:** 1 minute  
+**Signup:** https://openrouter.ai
 
-| Your RAM | Recommended Models | Notes |
-|----------|-------------------|-------|
-| 4–7 GB | gemma3:1b | Very limited — only tiny models |
-| 8 GB | gemma3:4b, phi4-mini | Good compact selection |
-| 16 GB | + llama3.2:3b, deepseek-r1:7b, qwen2.5-coder:7b | Strong selection |
-| 32 GB | + qwen3:8b, gemma3:12b, mistral-nemo | Full library |
-| 64 GB+ | + gemma3:27b, llama3.3:70b | Near cloud quality |
-
----
-
-## Model Families Explained
-
-### 🧠 Reasoning: DeepSeek R1
-DeepSeek R1 uses **chain-of-thought** reasoning — it "thinks out loud" before answering.
-Great for math, logic, analysis, and complex questions.
-```bash
-ollama pull deepseek-r1:7b   # 8GB RAM minimum
-```
-
-### 💻 Coding: Qwen 2.5 Coder
-Best dedicated coding model available for free. Understands 92+ programming languages.
-```bash
-ollama pull qwen2.5-coder:7b   # 8GB RAM minimum
-```
-
-### 👁️ Vision: Gemma 3
-Gemma 3 models (1B, 4B, 12B, 27B) can analyze images in addition to text.
-```bash
-ollama pull gemma3:4b   # Compact vision model
-```
-
-### 🔮 Thinking Mode: Qwen 3
-Qwen 3 models support a "thinking" mode for deeper reasoning, similar to DeepSeek R1.
-```bash
-ollama pull qwen3:4b    # 4GB RAM
-ollama pull qwen3:8b    # 8GB RAM
-```
-
----
-
-## Web Interface (OpenWebUI)
-
-LAIA includes **OpenWebUI** — a full-featured web interface for chatting with your AI models.
-
-**Access it at:** [http://localhost:3000](http://localhost:3000)
-
-Features:
-- Chat with any installed model
-- Image uploads (with vision models like Gemma 3)
-- Multiple chat history
-- Model switching on the fly
-- Markdown rendering
-
----
-
-## Managing Models
+Aggregates dozens of free models under one API. Append `:free` to model IDs.
 
 ```bash
-# List installed models
-ollama list
-
-# Remove a model (frees disk space)
-ollama rm gemma3:4b
-
-# Check Ollama status
-ollama ps
-
-# Run a model in terminal
-ollama run gemma3:4b
+curl -X POST https://openrouter.ai/api/v1/chat/completions \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/llama-3.1-8b-instruct:free",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
 ```
 
----
+### HuggingFace Inference
 
-## Privacy & Security
+**Models:** 100k+ open models  
+**Setup:** 1 minute (get token at https://huggingface.co/settings/tokens)  
 
-- Ollama binds to **127.0.0.1 only** — not accessible from other computers on your network
-- OpenWebUI also runs on localhost only
-- No telemetry, no data collection, no external API calls during inference
-- Models are downloaded once and stored locally
-
----
-
-## Troubleshooting
-
-**Model is slow:**
-- Check available RAM with: `free -h`
-- Smaller models are faster: try `gemma3:1b` or `gemma3:4b`
-- If you have an NVIDIA GPU, Ollama uses it automatically
-
-**Out of disk space:**
 ```bash
-du -sh ~/.ollama/models/   # See how much space models use
-ollama rm <model-name>     # Remove unused models
+curl -X POST https://api-inference.huggingface.co/v1/chat/completions \
+  -H "Authorization: Bearer $HF_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
 ```
 
-**Ollama not running:**
+### Mistral AI
+
+**Models:** Mistral 7B Open, Mixtral 8x7B  
+**Signup:** https://console.mistral.ai  
+
 ```bash
-sudo systemctl status ollama
-sudo systemctl start ollama
+curl -X POST https://api.mistral.ai/v1/chat/completions \
+  -H "Authorization: Bearer $MISTRAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "open-mistral-7b",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
 ```
 
-**OpenWebUI not loading:**
+### Google AI Studio
+
+**Models:** Gemini 2.0 Flash (vision-capable), Gemini 1.5 Flash  
+**Signup:** https://aistudio.google.com/apikey  
+
 ```bash
-sudo systemctl status laia-openwebui
-sudo systemctl restart laia-openwebui
+curl -X POST https://generativelanguage.googleapis.com/v1beta/openai/chat/completions \
+  -H "x-goog-api-key: $GOOGLE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-2.0-flash",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
 ```
+
+## 🖥️ Local Models (Ollama)
+
+Run models on your computer. Fully private, works offline.
+
+### Hardware Requirements
+
+| Tier | RAM | Models | Setup Time |
+|------|-----|--------|------------|
+| **Minimal** | 4-8 GB | Gemma 3 1B–4B | 5 min |
+| **Standard** | 16 GB | Gemma 3 4B–7B models | 10 min |
+| **Powerful** | 32+ GB | All models, 70B capable | 10 min |
+
+### Recommended Models
+
+**Compact (4B–7B):**
+- `gemma3:4b` — Best all-rounder, vision-capable
+- `phi4-mini` — Best for coding
+- `deepseek-r1:7b` — Strong reasoning
+
+**Powerful (70B):**
+- `llama3.3:70b` — Near-frontier quality
+- `deepseek-r1:70b` — Best open reasoning
+
+### Install
+
+```bash
+# Install Ollama
+curl https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull gemma3:4b
+
+# Run
+ollama serve
+```
+
+The model runs at `http://127.0.0.1:11434`. LAIA auto-detects it.
+
+## 🌐 LAN Remote (Ollama on Network)
+
+Connect to Ollama running on another machine (home server, workstation, etc.).
+
+### Server Setup
+
+On the machine running Ollama, ensure it listens on all interfaces:
+
+```bash
+sudo systemctl edit ollama
+# Add or modify:
+# [Service]
+# Environment="OLLAMA_HOST=0.0.0.0:11434"
+
+sudo systemctl restart ollama
+```
+
+Verify:
+```bash
+curl http://localhost:11434/api/tags
+```
+
+### Client Setup
+
+In LAIA setup, choose "LAN Remote" and enter:
+- **Host:** `192.168.1.100` (your server's IP)
+- **Port:** `11434` (default)
+
+LAIA will auto-detect available models and use them.
+
+## Switching Modes
+
+Change AI mode at any time:
+
+```bash
+bash /opt/laia/scripts/setup-ai-provider.sh
+```
+
+Or use the GUI:
+```bash
+laia-config  # Open configurator → AI Keys tab
+```
+
+## Testing Your Setup
+
+```bash
+bash /opt/laia/scripts/test-connection.sh
+```
+
+This verifies your chosen AI mode is working.

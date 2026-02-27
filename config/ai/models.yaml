@@ -1,163 +1,107 @@
 # LAIA AI Model Configuration
-# Models are categorized by RAM requirement and use case
-# All models are free and run locally via Ollama
-#
-# Research notes (2026-02):
-#   - gemma3 (Feb 2026) is Google's newest — vision-capable, replaces gemma2 for new installs
-#   - qwen3 (Oct 2025) adds thinking/reasoning mode; 0.6b–235b range
-#   - deepseek-r1 is the top open reasoning model family
-#   - qwen2.5-coder remains the best dedicated coding model at 7B
-#   - phi4-mini is excellent for coding on constrained hardware
+# 
+# LAIA supports three AI modes:
+#   - online:  Use a free cloud API (recommended — no download, no GPU)
+#   - local:   Run Ollama on this machine
+#   - lan:     Connect to Ollama on your LAN
 
-models:
-  # Tier 1: Works on 8GB RAM systems (essential)
-  essential:
+# ─── ONLINE FREE MODELS ────────────────────────────────────────────────────
+# See config/ai/providers.yaml for full provider details and API setup
+online:
+  default_provider: groq
+  default_model: llama-3.1-8b-instant
+  recommended:
+    - provider: groq
+      model: llama-3.1-8b-instant
+      reason: "Fastest free inference, no setup beyond API key"
+    - provider: openrouter
+      model: "meta-llama/llama-3.1-8b-instruct:free"
+      reason: "Access to many free models through one key"
+    - provider: google
+      model: "gemini-2.0-flash"
+      reason: "Vision-capable, multilingual, generous free tier"
+
+# ─── LOCAL MODELS (Ollama) ──────────────────────────────────────────────────
+local:
+  default_model: gemma3:4b
+
+  tiers:
+    minimal:
+      install_default: ["gemma3:1b", "gemma3:4b"]
+      optional: ["phi4-mini", "llama3.2:3b"]
+
+    standard:
+      install_default: ["gemma3:4b"]
+      optional: ["deepseek-r1:7b", "qwen2.5-coder:7b", "llama3.3:70b"]
+
+    powerful:
+      install_default: ["gemma3:12b"]
+      optional: ["qwen3:8b", "deepseek-r1:70b"]
+
+  catalog:
     - id: "gemma3:1b"
       name: "Gemma 3 (1B)"
-      description: "Google's newest model. Extremely fast, vision-capable, great quality for its size."
+      description: "Tiny but capable. Vision-enabled. 1GB download."
       ram_gb: 1
-      install_by_default: true
       use_case: "general"
 
     - id: "gemma3:4b"
       name: "Gemma 3 (4B)"
-      description: "Google's best compact model (Feb 2026). Vision support, strong reasoning."
+      description: "Best compact local model (Feb 2026). Vision, reasoning, fast."
       ram_gb: 4
-      install_by_default: true
       use_case: "general"
+      recommended: true
 
     - id: "llama3.2:3b"
       name: "Llama 3.2 (3B)"
-      description: "Meta's compact model. Fast, capable, great for general use."
+      description: "Meta's compact model. Tool-calling capable."
       ram_gb: 3
-      install_by_default: true
-      use_case: "general"
-
-    - id: "gemma2:2b"
-      name: "Gemma 2 (2B)"
-      description: "Google's efficient 2B model. Excellent quality for its size."
-      ram_gb: 2
-      install_by_default: false
       use_case: "general"
 
     - id: "phi4-mini"
       name: "Phi-4 Mini"
-      description: "Microsoft's compact reasoning model. Great for coding."
+      description: "Microsoft's compact reasoning model. Excellent for coding."
       ram_gb: 4
-      install_by_default: true
       use_case: "coding"
-
-    - id: "mistral:7b"
-      name: "Mistral 7B"
-      description: "Strong general model. Requires 8GB RAM."
-      ram_gb: 7
-      install_by_default: false
-      use_case: "general"
-      warning: "Requires 8GB RAM. May be slow on minimal hardware."
-
-  # Tier 2: Recommended for 16GB+ RAM
-  recommended:
-    - id: "llama3.2:latest"
-      name: "Llama 3.2 (latest)"
-      description: "Meta's current compact flagship. Tools-capable."
-      ram_gb: 4
-      install_by_default: false
-      use_case: "general"
-
-    - id: "gemma2:9b"
-      name: "Gemma 2 (9B)"
-      description: "Google's 9B model. Strong reasoning capabilities."
-      ram_gb: 9
-      install_by_default: false
-      use_case: "general"
-
-    - id: "gemma3:12b"
-      name: "Gemma 3 (12B)"
-      description: "Google's mid-range 2026 model. Vision + strong reasoning."
-      ram_gb: 12
-      install_by_default: false
-      use_case: "general"
 
     - id: "deepseek-r1:7b"
       name: "DeepSeek R1 (7B)"
-      description: "Top open reasoning model with chain-of-thought thinking."
+      description: "Best open reasoning model. Think step-by-step."
       ram_gb: 7
-      install_by_default: false
-      use_case: "reasoning"
-
-    - id: "deepseek-r1:8b"
-      name: "DeepSeek R1 (8B)"
-      description: "Llama-based DeepSeek R1 variant. Strong reasoning."
-      ram_gb: 8
-      install_by_default: false
       use_case: "reasoning"
 
     - id: "qwen2.5-coder:7b"
       name: "Qwen 2.5 Coder (7B)"
-      description: "Best specialized coding model at 7B. Excellent for code generation."
+      description: "Best coding model at 7B. Code completion + explanation."
       ram_gb: 7
-      install_by_default: false
       use_case: "coding"
 
-    - id: "qwen3:4b"
-      name: "Qwen 3 (4B)"
-      description: "Alibaba's latest (Oct 2025). Thinking mode + tools support."
-      ram_gb: 4
-      install_by_default: false
-      use_case: "general"
-
-    - id: "qwen3:8b"
-      name: "Qwen 3 (8B)"
-      description: "Qwen 3 mid-range with thinking mode. Strong all-rounder."
-      ram_gb: 8
-      install_by_default: false
-      use_case: "general"
-
-    - id: "mistral-nemo"
-      name: "Mistral Nemo (12B)"
-      description: "Mistral + NVIDIA collaboration. 128k context. Strong reasoning."
+    - id: "gemma3:12b"
+      name: "Gemma 3 (12B)"
+      description: "Powerful Google model with vision. Needs 16GB RAM."
       ram_gb: 12
-      install_by_default: false
       use_case: "general"
+      warning: "Requires 16GB RAM"
 
-  # Tier 3: For high-end hardware (32GB+ RAM)
-  advanced:
     - id: "llama3.3:70b"
       name: "Llama 3.3 (70B)"
-      description: "Near Llama 3.1 405B quality at 70B size. State-of-the-art open model."
+      description: "Near-frontier open model quality."
       ram_gb: 40
-      install_by_default: false
       use_case: "general"
-      warning: "Requires 40GB+ RAM or NVIDIA GPU with 24GB+ VRAM"
+      warning: "Requires 40GB+ RAM or GPU"
 
     - id: "deepseek-r1:70b"
       name: "DeepSeek R1 (70B)"
-      description: "Best open reasoning model available. Approaches o3 quality."
+      description: "Best open reasoning model. Approaches o3 quality."
       ram_gb: 40
-      install_by_default: false
       use_case: "reasoning"
-      warning: "Requires 40GB+ RAM or NVIDIA GPU with 24GB+ VRAM"
+      warning: "Requires 40GB+ RAM or GPU"
 
-    - id: "gemma3:27b"
-      name: "Gemma 3 (27B)"
-      description: "Google's most capable Gemma 3 variant with vision support."
-      ram_gb: 20
-      install_by_default: false
-      use_case: "general"
-      warning: "Requires 20GB+ RAM or GPU with 16GB+ VRAM"
-
-hardware_profiles:
-  minimal:
-    ram_gb: 8
-    recommended_models: ["gemma3:1b", "gemma3:4b", "phi4-mini"]
-    message: "Minimal hardware — only small models recommended"
-
-  standard:
-    ram_gb: 16
-    recommended_models: ["gemma3:4b", "llama3.2:3b", "phi4-mini", "deepseek-r1:7b", "qwen2.5-coder:7b"]
-    message: "Standard hardware — good model selection available"
-
-  powerful:
-    ram_gb: 32
-    recommended_models: ["gemma3:12b", "qwen3:8b", "deepseek-r1:8b", "qwen2.5-coder:7b", "mistral-nemo"]
-    message: "Powerful hardware — full model library available"
+# ─── LAN REMOTE ─────────────────────────────────────────────────────────────
+lan:
+  description: "Connect to an Ollama instance running on your local network."
+  setup: "Run 'laia-setup' and choose option 7 (LAN Remote)"
+  server_setup_hint: |
+    On the server machine, set Ollama to listen on all interfaces:
+    echo 'OLLAMA_HOST=0.0.0.0' | sudo tee -a /etc/systemd/system/ollama.service
+    sudo systemctl daemon-reload && sudo systemctl restart ollama

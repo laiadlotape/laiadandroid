@@ -1,0 +1,174 @@
+# LAIA AI Provider Catalog
+# All providers listed have free tiers as of 2026-02
+# Providers use OpenAI-compatible Chat Completions API unless noted
+
+version: "1.0"
+
+providers:
+
+  groq:
+    name: "Groq"
+    description: "Fastest free inference. 300-560 tok/sec. No credit card required."
+    signup_url: "https://console.groq.com"
+    api_base: "https://api.groq.com/openai/v1"
+    api_key_env: "GROQ_API_KEY"
+    api_key_header: "Authorization: Bearer"
+    compatible: "openai"
+    free_tier: true
+    rate_limit: "30 req/min, 14400 req/day"
+    context_window: 131072
+    recommended: true
+    models:
+      - id: "llama-3.1-8b-instant"
+        name: "Llama 3.1 8B Instant"
+        description: "Fast and capable. 560 tok/sec. Best default choice."
+        free: true
+        recommended: true
+        use_case: "general"
+      - id: "llama-3.3-70b-versatile"
+        name: "Llama 3.3 70B Versatile"
+        description: "Near-frontier quality, 280 tok/sec. Best for complex tasks."
+        free: true
+        use_case: "general"
+      - id: "gemma2-9b-it"
+        name: "Gemma 2 9B"
+        description: "Google's efficient model. Great quality."
+        free: true
+        use_case: "general"
+      - id: "mixtral-8x7b-32768"
+        name: "Mixtral 8x7B"
+        description: "MoE architecture. Strong reasoning, 32k context."
+        free: true
+        use_case: "reasoning"
+      - id: "llama-3.2-3b-preview"
+        name: "Llama 3.2 3B"
+        description: "Fastest option for simple tasks."
+        free: true
+        use_case: "general"
+
+  openrouter:
+    name: "OpenRouter"
+    description: "Aggregates 200+ models. Free tier for many models."
+    signup_url: "https://openrouter.ai"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+    api_key_header: "Authorization: Bearer"
+    compatible: "openai"
+    free_tier: true
+    rate_limit: "20 req/min (free tier)"
+    note: "Append ':free' to model ID for free models, e.g. 'meta-llama/llama-3.1-8b-instruct:free'"
+    models:
+      - id: "meta-llama/llama-3.1-8b-instruct:free"
+        name: "Llama 3.1 8B (Free)"
+        free: true
+        recommended: true
+        use_case: "general"
+      - id: "microsoft/phi-3-mini-128k-instruct:free"
+        name: "Phi-3 Mini (Free)"
+        free: true
+        use_case: "general"
+      - id: "google/gemma-2-9b-it:free"
+        name: "Gemma 2 9B (Free)"
+        free: true
+        use_case: "general"
+      - id: "mistralai/mistral-7b-instruct:free"
+        name: "Mistral 7B (Free)"
+        free: true
+        use_case: "general"
+      - id: "deepseek/deepseek-r1:free"
+        name: "DeepSeek R1 (Free)"
+        free: true
+        use_case: "reasoning"
+        description: "Top reasoning model, free on OpenRouter."
+
+  huggingface:
+    name: "HuggingFace Inference"
+    description: "Free inference for 100k+ open models. HF token required."
+    signup_url: "https://huggingface.co/settings/tokens"
+    api_base: "https://api-inference.huggingface.co/v1"
+    api_key_env: "HF_TOKEN"
+    api_key_header: "Authorization: Bearer"
+    compatible: "openai"
+    free_tier: true
+    rate_limit: "Varies by model"
+    models:
+      - id: "meta-llama/Llama-3.1-8B-Instruct"
+        name: "Llama 3.1 8B"
+        free: true
+        recommended: true
+        use_case: "general"
+      - id: "mistralai/Mistral-7B-Instruct-v0.3"
+        name: "Mistral 7B"
+        free: true
+        use_case: "general"
+      - id: "google/gemma-2-9b-it"
+        name: "Gemma 2 9B"
+        free: true
+        use_case: "general"
+      - id: "Qwen/Qwen2.5-7B-Instruct"
+        name: "Qwen 2.5 7B"
+        free: true
+        use_case: "general"
+
+  mistral:
+    name: "Mistral AI"
+    description: "European AI with strong multilingual support. Free tier available."
+    signup_url: "https://console.mistral.ai"
+    api_base: "https://api.mistral.ai/v1"
+    api_key_env: "MISTRAL_API_KEY"
+    api_key_header: "Authorization: Bearer"
+    compatible: "openai"
+    free_tier: true
+    rate_limit: "1 req/sec (free tier)"
+    models:
+      - id: "open-mistral-7b"
+        name: "Mistral 7B (Open)"
+        free: true
+        recommended: true
+        use_case: "general"
+      - id: "open-mixtral-8x7b"
+        name: "Mixtral 8x7B (Open)"
+        free: false
+        use_case: "reasoning"
+
+  google:
+    name: "Google AI Studio"
+    description: "Free Gemini models via Google AI Studio API."
+    signup_url: "https://aistudio.google.com/apikey"
+    api_base: "https://generativelanguage.googleapis.com/v1beta/openai"
+    api_key_env: "GOOGLE_API_KEY"
+    api_key_header: "x-goog-api-key"
+    compatible: "openai"
+    free_tier: true
+    rate_limit: "15 req/min (free tier)"
+    models:
+      - id: "gemini-2.0-flash"
+        name: "Gemini 2.0 Flash"
+        description: "Fast, capable, vision-enabled. Google's recommended free model."
+        free: true
+        recommended: true
+        use_case: "general"
+      - id: "gemini-1.5-flash"
+        name: "Gemini 1.5 Flash"
+        free: true
+        use_case: "general"
+
+# Local Ollama (this machine)
+local:
+  engine: "ollama"
+  api_base: "http://127.0.0.1:11434/v1"
+  compatible: "openai"
+  default_model: "gemma3:4b"
+  recommended_models:
+    minimal_8gb: ["gemma3:1b", "gemma3:4b", "llama3.2:3b"]
+    standard_16gb: ["gemma3:4b", "deepseek-r1:7b", "qwen2.5-coder:7b"]
+    powerful_32gb: ["gemma3:12b", "qwen3:8b", "llama3.3:70b"]
+
+# LAN Remote Ollama
+lan:
+  engine: "ollama"
+  api_base: "http://{host}:{port}/v1"
+  compatible: "openai"
+  default_port: 11434
+  default_model: "gemma3:4b"
+  discovery: "mdns"

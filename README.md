@@ -1,64 +1,114 @@
-# LAIA Linux
+<div align="center">
 
-> **L**inux **A**I **I**ntelligent **A**ppliance — A secure, portable, AI-ready Linux distribution.
+# LAIA
 
-[![Build & Test](https://github.com/laiadlotape/laia/workflows/Build%20%26%20Test/badge.svg)](https://github.com/laiadlotape/laia/actions)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL3-blue.svg)](LICENSE)
-[![Hardware: x86_64 / arm64](https://img.shields.io/badge/Hardware-x86__64%20%7C%20arm64-green.svg)](#hardware-requirements)
+**The AI-ready Linux distribution.**  
+Online free models · Local inference · LAN remote · Privacy-first
 
-LAIA is a minimal, secure Linux distribution built on Debian Stable, designed to be:
-- **Cloned in minutes** — one script replicates a full working system
-- **AI-ready** — Ollama + curated free models pre-installed and running locally
-- **Security-first** — hardened kernel, AppArmor, restricted firewall, safe OpenClaw config
-- **Windows-friendly** — graphical setup wizard and familiar UX patterns
-- **Portable** — tested on modest hardware, runs live from USB
+[![Build Status](https://github.com/laiadlotape/laia/actions/workflows/build-test.yml/badge.svg)](https://github.com/laiadlotape/laia/actions)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Debian Bookworm](https://img.shields.io/badge/base-Debian%20Bookworm-red.svg)](https://debian.org)
+
+</div>
+
+## What is LAIA?
+
+LAIA is a Debian-based Linux distribution built around one idea: **AI should just work**, without requiring powerful hardware, expensive APIs, or complex setup.
+
+**Three ways to use AI with LAIA — choose what fits you:**
+
+| Mode | Setup time | Requirements | Best for |
+|------|-----------|--------------|----------|
+| ☁️ **Online Free** | 30 seconds | Free API key | Everyone — no hardware needed |
+| 🖥️ **Local** | 5–10 min | 4GB+ RAM | Privacy, offline use |
+| 🌐 **LAN Remote** | 10 seconds | Ollama on another machine | Home labs, shared servers |
 
 ## Quick Start
 
-```bash
-# Install on existing Debian/Ubuntu system:
-curl -fsSL https://raw.githubusercontent.com/laiadlotape/laia/main/scripts/install.sh | sudo bash
+### Option 1: Online Free (Recommended)
 
-# Or build ISO from source:
-make iso
+1. Get a free API key from [Groq](https://console.groq.com) — no credit card needed
+2. Install LAIA and run `laia-setup`
+3. Choose "Online Free" → "Groq" → paste your key
+4. Done — 300+ tokens/second, free
+
+### Option 2: Local Inference
+
+```bash
+laia-setup  # choose "Local" → picks models based on your RAM
 ```
 
-## Hardware Requirements
+### Option 3: LAN Remote
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| CPU | x86_64 / arm64, 2 cores | 4+ cores |
-| RAM | 8 GB | 16 GB (for larger AI models) |
-| Storage | 32 GB | 64+ GB |
-| Network | Required for setup | — |
+```bash
+laia-setup  # choose "LAN Remote" → enter your Ollama server IP
+```
 
-Tested on: Raspberry Pi 5, generic x86_64 laptops, old Intel MacBooks, mini PCs (N100 chipset).
+## Free Online Providers
 
-## What's Included
+| Provider | Speed | Free Models | Signup |
+|----------|-------|-------------|--------|
+| **Groq** ⭐ | 300–560 tok/sec | Llama 3.1 8B/70B, Gemma 2, Mixtral | [console.groq.com](https://console.groq.com) |
+| **OpenRouter** | Varies | 50+ free models (`:free` suffix) | [openrouter.ai](https://openrouter.ai) |
+| **HuggingFace** | Varies | 100k+ open models | [huggingface.co](https://huggingface.co) |
+| **Mistral AI** | Fast | Mistral 7B open | [console.mistral.ai](https://console.mistral.ai) |
+| **Google AI Studio** | Fast | Gemini 2.0 Flash | [aistudio.google.com](https://aistudio.google.com) |
 
-- **Base**: Debian Bookworm + XFCE (lightweight, Windows-familiar)
-- **AI stack**: Ollama + OpenWebUI + curated free models (Gemma 2, Phi-4 Mini, Llama 3.2, Mistral)
-- **Security**: AppArmor enforcing, UFW firewall, fail2ban, automatic security updates
-- **OpenClaw**: Pre-installed in maximally restricted mode with GUI configurator
-- **LAIA Tools**: Graphical security configurator, first-run setup wizard, model manager
+## Features
 
-## Documentation
+- **Seamless provider switching** — change from Groq to local Ollama in one command
+- **OpenWebUI** — beautiful chat interface, works with all providers
+- **OpenClaw** — AI assistant integrated into the desktop (restrictive by default)
+- **Security-first** — AppArmor profiles, UFW rules, fail2ban, sysctl hardening
+- **Portable** — runs on x86_64 and ARM64 (Pi 4/5 friendly)
+- **Frictionless** — LAIA setup wizard gets you running in under 2 minutes
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│              User Applications               │
+│         OpenWebUI · OpenClaw · Apps         │
+├─────────────────────────────────────────────┤
+│              LAIA AI Router                  │
+│   (mode: online | local | lan)              │
+├──────────────┬──────────────┬───────────────┤
+│  Online Free │    Local     │  LAN Remote   │
+│  Groq/OR/HF  │   Ollama     │  Ollama/LMS   │
+│  /OpenAI API │  127.0.0.1   │  192.168.x.x  │
+└──────────────┴──────────────┴───────────────┘
+│              Debian Bookworm Base            │
+│              XFCE · Security Layer          │
+└─────────────────────────────────────────────┘
+```
+
+## Installation
+
+```bash
+# Download and run installer
+curl -fsSL https://raw.githubusercontent.com/laiadlotape/laia/master/scripts/install.sh | sudo bash
+
+# Or clone and install
+git clone https://github.com/laiadlotape/laia
+cd laia && sudo bash scripts/install.sh
+```
+
+## Configuration
+
+```bash
+laia-setup          # First-time AI setup wizard
+laia-config         # GUI settings (GTK3)
+laia-test           # Test current AI connection
+```
+
+## Docs
 
 - [Installation Guide](docs/INSTALL.md)
-- [User Guide](docs/USER_GUIDE.md)
-- [Security Configuration](docs/SECURITY.md)
-- [AI Models Guide](docs/AI_MODELS.md)
-- [Building from Source](docs/BUILD.md)
+- [AI Models & Providers](docs/AI_MODELS.md)
+- [Security](docs/SECURITY.md)
+- [Build from source](docs/BUILD.md)
 - [Contributing](docs/CONTRIBUTING.md)
-
-## Philosophy
-
-LAIA exists because setting up a secure, AI-capable Linux system takes days.
-We believe it should take minutes.
-
-Security is not optional. Every default is hardened. You relax restrictions
-through a GUI that explains the risks as you go.
 
 ## License
 
-GPL-3.0 — see [LICENSE](LICENSE)
+GPL-3.0 — see [LICENSE](LICENSE). Free to use, modify, and distribute.

@@ -1,7 +1,7 @@
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y \
-    bash curl wget git python3 python3-pip \
+    bash curl wget git python3 python3-pip python3-yaml \
     ufw apparmor apparmor-utils \
     systemd dbus \
     --no-install-recommends \

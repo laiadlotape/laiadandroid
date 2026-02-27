@@ -6,13 +6,26 @@
 .pub-cache/
 .pub/
 /build/
+
+# APK files (distribute via GitHub Releases, not git)
 *.apk
 *.ipa
+*.aab
 *.aar
 *.app
 *.appbundle
 *.exe
 *.zip
+
+# JVM crash logs
+hs_err_pid*.log
+
+# Android build output
+android/build/
+
+# iOS
+ios/Pods/
+ios/.symlinks/
 
 # Generated files
 *.g.dart

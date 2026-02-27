@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
-import 'package:laia_chat/services/ai_service.dart';
-import 'package:laia_chat/config/app_config.dart';
+import 'package:laia_android/services/ai_service.dart';
+import 'package:laia_android/config/app_config.dart';
 
 void main() {
   group('AiService', () {

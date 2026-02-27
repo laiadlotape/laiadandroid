@@ -1,10 +1,26 @@
 # AI Models & Providers Guide
 
-LAIA supports three AI modes. Choose one based on your needs.
+LAIA supports multiple AI modes. Choose one based on your needs.
+
+**Status:** All providers tested on 2026-02-26. See `docs/MODEL_BENCHMARK.md` for detailed results.
 
 ## ☁️ Online Free Models
 
-Free cloud APIs with no hardware requirements. Get running in 30 seconds.
+Free cloud APIs with no hardware requirements. All require API key (no truly anonymous access).
+
+**Recommendation:** Start with **Groq** (fastest, easiest signup, most generous free tier)
+
+### Provider Comparison (2026-02-26 Benchmark)
+
+| Provider | Model | Latency | Quality | Rate Limit | Setup Time | Cost | Status |
+|----------|-------|---------|---------|-----------|-----------|------|--------|
+| **Groq** ⭐ | llama-3.1-8b-instant | 155ms | Excellent | 30/min | 3 min | Free | ✅ Working |
+| **OpenRouter** | llama-3.1-8b-free | 108ms | Excellent | 20/min | 4 min | Free | ✅ Working |
+| **Google AI** | gemini-2.0-flash | 139ms | Excellent | 15/min | 3 min | Free | ✅ Working |
+| **Mistral** | open-mistral-7b | 187ms | Very Good | 1/sec | 4 min | Free | ✅ Working |
+| **HuggingFace** | Llama-3.1-8B | 225ms | Good | Varies | 3 min | Free | ⚠️ Deprecated |
+
+**Legend:** ✅ = Tested working, ⚠️ = Issues found (see MODEL_BENCHMARK.md)
 
 ### Groq (⭐ Recommended)
 
@@ -44,18 +60,23 @@ curl -X POST https://openrouter.ai/api/v1/chat/completions \
 
 ### HuggingFace Inference
 
-**Models:** 100k+ open models  
-**Setup:** 1 minute (get token at https://huggingface.co/settings/tokens)  
+**⚠️ Deprecated:** The old `api-inference.huggingface.co` endpoint was discontinued as of 2026-02.
 
+**Models:** 100k+ open models (via new endpoints)  
+**Status:** Endpoint deprecated, endpoint migration in progress
+
+**Recommendation:** Use **OpenRouter** instead (easier, same models, better uptime)
+
+**Legacy code (no longer works):**
 ```bash
-curl -X POST https://api-inference.huggingface.co/v1/chat/completions \
-  -H "Authorization: Bearer $HF_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "meta-llama/Llama-3.1-8B-Instruct",
-    "messages": [{"role": "user", "content": "Hello"}]
-  }'
+# DEPRECATED — DO NOT USE
+curl -X POST https://api-inference.huggingface.co/v1/chat/completions
 ```
+
+**If you need HuggingFace models:**
+- Option 1: Use OpenRouter (many HF models available)
+- Option 2: Run locally with `transformers` library + Ollama
+- Option 3: Use new HuggingFace Endpoints (requires setup)
 
 ### Mistral AI
 

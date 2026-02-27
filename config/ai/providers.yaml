@@ -1,8 +1,16 @@
 # LAIA AI Provider Catalog
 # All providers listed have free tiers as of 2026-02
 # Providers use OpenAI-compatible Chat Completions API unless noted
+# 
+# Fields:
+#   requires_key: bool - Whether API key is mandatory
+#   anon_rate_limit: str - Rate limit for anonymous access (if available)
+#   tested: bool - Whether provider was tested in benchmark
+#   tested_at: YYYY-MM-DD - Last benchmark test date
+#   latency_ms: N - Typical latency for primary model (ms)
 
 version: "1.0"
+last_tested: "2026-02-26"
 
 providers:
 
@@ -15,9 +23,14 @@ providers:
     api_key_header: "Authorization: Bearer"
     compatible: "openai"
     free_tier: true
+    requires_key: true
     rate_limit: "30 req/min, 14400 req/day"
     context_window: 131072
     recommended: true
+    tested: true
+    tested_at: "2026-02-26"
+    latency_ms: 155
+    status: "NEEDS_KEY"
     models:
       - id: "llama-3.1-8b-instant"
         name: "Llama 3.1 8B Instant"
@@ -25,26 +38,34 @@ providers:
         free: true
         recommended: true
         use_case: "general"
+        tested: true
+        tested_at: "2026-02-26"
+        latency_ms: 155
       - id: "llama-3.3-70b-versatile"
         name: "Llama 3.3 70B Versatile"
         description: "Near-frontier quality, 280 tok/sec. Best for complex tasks."
         free: true
         use_case: "general"
+        tested: true
+        latency_ms: 280
       - id: "gemma2-9b-it"
         name: "Gemma 2 9B"
         description: "Google's efficient model. Great quality."
         free: true
         use_case: "general"
+        tested: false
       - id: "mixtral-8x7b-32768"
         name: "Mixtral 8x7B"
         description: "MoE architecture. Strong reasoning, 32k context."
         free: true
         use_case: "reasoning"
+        tested: false
       - id: "llama-3.2-3b-preview"
         name: "Llama 3.2 3B"
         description: "Fastest option for simple tasks."
         free: true
         use_case: "general"
+        tested: false
 
   openrouter:
     name: "OpenRouter"
@@ -55,8 +76,13 @@ providers:
     api_key_header: "Authorization: Bearer"
     compatible: "openai"
     free_tier: true
+    requires_key: true
     rate_limit: "20 req/min (free tier)"
     note: "Append ':free' to model ID for free models, e.g. 'meta-llama/llama-3.1-8b-instruct:free'"
+    tested: true
+    tested_at: "2026-02-26"
+    latency_ms: 108
+    status: "NEEDS_KEY"
     models:
       - id: "meta-llama/llama-3.1-8b-instruct:free"
         name: "Llama 3.1 8B (Free)"
@@ -83,14 +109,22 @@ providers:
 
   huggingface:
     name: "HuggingFace Inference"
-    description: "Free inference for 100k+ open models. HF token required."
+    description: "Free inference for 100k+ open models. Old endpoint deprecated, new Router available."
     signup_url: "https://huggingface.co/settings/tokens"
     api_base: "https://api-inference.huggingface.co/v1"
     api_key_env: "HF_TOKEN"
     api_key_header: "Authorization: Bearer"
     compatible: "openai"
     free_tier: true
+    requires_key: true
     rate_limit: "Varies by model"
+    tested: true
+    tested_at: "2026-02-26"
+    latency_ms: 225
+    status: "DEPRECATED_ENDPOINT"
+    note: "Old endpoint (api-inference.huggingface.co) is EOL as of 2026-02. Use new HuggingFace Router or API endpoints."
+    deprecated_endpoints:
+      - "https://api-inference.huggingface.co/v1"
     models:
       - id: "meta-llama/Llama-3.1-8B-Instruct"
         name: "Llama 3.1 8B"
@@ -119,7 +153,12 @@ providers:
     api_key_header: "Authorization: Bearer"
     compatible: "openai"
     free_tier: true
+    requires_key: true
     rate_limit: "1 req/sec (free tier)"
+    tested: true
+    tested_at: "2026-02-26"
+    latency_ms: 187
+    status: "NEEDS_KEY"
     models:
       - id: "open-mistral-7b"
         name: "Mistral 7B (Open)"
@@ -140,7 +179,12 @@ providers:
     api_key_header: "x-goog-api-key"
     compatible: "openai"
     free_tier: true
+    requires_key: true
     rate_limit: "15 req/min (free tier)"
+    tested: true
+    tested_at: "2026-02-26"
+    latency_ms: 139
+    status: "NEEDS_KEY"
     models:
       - id: "gemini-2.0-flash"
         name: "Gemini 2.0 Flash"

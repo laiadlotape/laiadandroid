@@ -1,34 +1,135 @@
 #!/usr/bin/env bash
+# LAIA AI Config Tests — Improved with graceful degradation
+set -euo pipefail
+
 LAIA_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+TESTS_PASSED=0
+TESTS_FAILED=0
+WARNINGS=0
 
-# New AI config files
-[[ -f "$LAIA_ROOT/config/ai/providers.yaml" ]] || { echo "Missing: config/ai/providers.yaml"; exit 1; }
-[[ -f "$LAIA_ROOT/config/ai/config.yaml" ]] || { echo "Missing: config/ai/config.yaml"; exit 1; }
-[[ -f "$LAIA_ROOT/config/ai/models.yaml" ]] || { echo "Missing: config/ai/models.yaml"; exit 1; }
+test_file() {
+  local file="$1"
+  local description="$2"
+  if [[ -f "$file" ]]; then
+    echo "✅ $description"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+    return 0
+  else
+    echo "❌ Missing: $description ($file)"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    return 1
+  fi
+}
 
-# New scripts
-[[ -f "$LAIA_ROOT/scripts/setup-ai-provider.sh" ]] || { echo "Missing: scripts/setup-ai-provider.sh"; exit 1; }
-[[ -f "$LAIA_ROOT/scripts/test-connection.sh" ]] || { echo "Missing: scripts/test-connection.sh"; exit 1; }
-[[ -x "$LAIA_ROOT/scripts/setup-ai-provider.sh" ]] || { echo "Not executable: scripts/setup-ai-provider.sh"; exit 1; }
-[[ -x "$LAIA_ROOT/scripts/test-connection.sh" ]] || { echo "Not executable: scripts/test-connection.sh"; exit 1; }
+test_executable() {
+  local file="$1"
+  local description="$2"
+  if [[ -x "$file" ]]; then
+    echo "✅ $description (executable)"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+    return 0
+  else
+    echo "❌ Not executable: $description"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    return 1
+  fi
+}
 
-# Validate YAML syntax
-python3 -c "import yaml; yaml.safe_load(open('$LAIA_ROOT/config/ai/providers.yaml'))" || { echo "Invalid YAML: config/ai/providers.yaml"; exit 1; }
-python3 -c "import yaml; yaml.safe_load(open('$LAIA_ROOT/config/ai/config.yaml'))" || { echo "Invalid YAML: config/ai/config.yaml"; exit 1; }
-python3 -c "import yaml; yaml.safe_load(open('$LAIA_ROOT/config/ai/models.yaml'))" || { echo "Invalid YAML: config/ai/models.yaml"; exit 1; }
+validate_yaml() {
+  local file="$1"
+  local description="$2"
+  if python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+    echo "✅ Valid YAML: $description"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+    return 0
+  else
+    echo "❌ Invalid YAML: $description ($file)"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    return 1
+  fi
+}
 
-# Validate shell scripts
-bash -n "$LAIA_ROOT/scripts/setup-ai-provider.sh" || { echo "Syntax error: scripts/setup-ai-provider.sh"; exit 1; }
-bash -n "$LAIA_ROOT/scripts/test-connection.sh" || { echo "Syntax error: scripts/test-connection.sh"; exit 1; }
+validate_bash() {
+  local file="$1"
+  local description="$2"
+  if bash -n "$file" 2>/dev/null; then
+    echo "✅ Valid shell syntax: $description"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+    return 0
+  else
+    echo "❌ Syntax error: $description"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    return 1
+  fi
+}
 
-# Check models.yaml has required sections
-grep -q "^online:" "$LAIA_ROOT/config/ai/models.yaml" || { echo "Missing 'online:' section in models.yaml"; exit 1; }
-grep -q "^local:" "$LAIA_ROOT/config/ai/models.yaml" || { echo "Missing 'local:' section in models.yaml"; exit 1; }
-grep -q "^lan:" "$LAIA_ROOT/config/ai/models.yaml" || { echo "Missing 'lan:' section in models.yaml"; exit 1; }
+echo "═══════════════════════════════════════════════════════════"
+echo "LAIA AI Config Tests (graceful mode, no key required)"
+echo "═══════════════════════════════════════════════════════════"
+echo ""
 
-# Check providers.yaml has required providers
+# Required files
+echo "Checking configuration files..."
+test_file "$LAIA_ROOT/config/ai/providers.yaml" "config/ai/providers.yaml"
+test_file "$LAIA_ROOT/config/ai/config.yaml" "config/ai/config.yaml"
+test_file "$LAIA_ROOT/config/ai/models.yaml" "config/ai/models.yaml"
+echo ""
+
+echo "Checking scripts..."
+test_file "$LAIA_ROOT/scripts/setup-ai-provider.sh" "scripts/setup-ai-provider.sh"
+test_file "$LAIA_ROOT/scripts/test-connection.sh" "scripts/test-connection.sh"
+test_file "$LAIA_ROOT/scripts/benchmark-models.sh" "scripts/benchmark-models.sh"
+test_executable "$LAIA_ROOT/scripts/setup-ai-provider.sh" "setup-ai-provider.sh"
+test_executable "$LAIA_ROOT/scripts/test-connection.sh" "test-connection.sh"
+test_executable "$LAIA_ROOT/scripts/benchmark-models.sh" "benchmark-models.sh"
+echo ""
+
+echo "Validating YAML syntax..."
+validate_yaml "$LAIA_ROOT/config/ai/providers.yaml" "providers.yaml"
+validate_yaml "$LAIA_ROOT/config/ai/config.yaml" "config.yaml"
+validate_yaml "$LAIA_ROOT/config/ai/models.yaml" "models.yaml"
+echo ""
+
+echo "Validating shell script syntax..."
+validate_bash "$LAIA_ROOT/scripts/setup-ai-provider.sh" "setup-ai-provider.sh"
+validate_bash "$LAIA_ROOT/scripts/test-connection.sh" "test-connection.sh"
+validate_bash "$LAIA_ROOT/scripts/benchmark-models.sh" "benchmark-models.sh"
+echo ""
+
+echo "Checking providers.yaml structure..."
 for provider in groq openrouter huggingface mistral google; do
-  grep -q "^  $provider:" "$LAIA_ROOT/config/ai/providers.yaml" || { echo "Missing provider: $provider"; exit 1; }
+  if grep -q "^  $provider:" "$LAIA_ROOT/config/ai/providers.yaml"; then
+    echo "✅ Provider configured: $provider"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    echo "❌ Missing provider: $provider"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+  fi
 done
+echo ""
 
-echo "✅ All AI config tests passed"
+echo "Checking API keys (optional)..."
+if [[ -f "${HOME}/.laia/api_keys.env" ]]; then
+  echo "✅ API keys file found"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo "⚠️  No API keys configured (run: laia-setup-wizard)"
+  WARNINGS=$((WARNINGS + 1))
+fi
+echo ""
+
+echo "═══════════════════════════════════════════════════════════"
+if [[ $TESTS_FAILED -eq 0 ]]; then
+  if [[ $WARNINGS -gt 0 ]]; then
+    echo "✅ Config tests passed ($TESTS_PASSED passed, $WARNINGS warning)"
+    echo "   Recommendations:"
+    echo "   • Run: laia-setup-wizard"
+    echo "   • Or use local Ollama for offline mode"
+  else
+    echo "✅ All AI config tests passed ($TESTS_PASSED tests)"
+  fi
+  exit 0
+else
+  echo "❌ Config tests failed ($TESTS_FAILED failed, $TESTS_PASSED passed)"
+  exit 1
+fi

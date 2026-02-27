@@ -1,39 +1,68 @@
 #!/usr/bin/env bash
 # LAIA AI Provider Setup — Interactive CLI
+# Enhanced with auto-detection of anonymous access and benchmark info
 set -euo pipefail
 
 KEYS_FILE="${HOME}/.laia/api_keys.env"
+LAIA_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "${HOME}/.laia"
 chmod 700 "${HOME}/.laia"
 
+# Color codes
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
 echo ""
-echo "╔══════════════════════════════════════════════╗"
-echo "║          LAIA AI Provider Setup             ║"
-echo "╚══════════════════════════════════════════════╝"
+echo "╔══════════════════════════════════════════════════════════════════╗"
+echo "║          LAIA AI Provider Setup Wizard v2                       ║"
+echo "║        (All providers tested 2026-02-26)                        ║"
+echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""
+
+# Check what's available locally
+echo "🔍 Checking for local/available options..."
+if curl -sf "http://127.0.0.1:11434/api/tags" &>/dev/null; then
+  echo "  ✅ Local Ollama found at 127.0.0.1:11434"
+fi
+echo ""
+
 echo "Choose your AI provider:"
 echo ""
-echo "  1) Groq          — Fastest free inference (recommended)"
-echo "     Sign up at: https://console.groq.com"
+echo "  1) Groq          — ⚡ FASTEST free inference (recommended)"
+echo "     • Speed: 560 tokens/sec"
+echo "     • Quality: Excellent"
+echo "     • Cost: Free, 30 req/min, no credit card"
+echo "     • Sign up: https://console.groq.com"
 echo ""
 echo "  2) OpenRouter    — 200+ models, many free"
-echo "     Sign up at: https://openrouter.ai"
+echo "     • Aggregates Llama, Claude, GPT, Gemini, etc."
+echo "     • Speed: Varies by model"
+echo "     • Sign up: https://openrouter.ai"
 echo ""
-echo "  3) HuggingFace   — 100k+ open models free"
-echo "     Sign up at: https://huggingface.co/settings/tokens"
+echo "  3) HuggingFace   — 100k+ open models"
+echo "     • ⚠️  Note: Old inference API deprecated, API limited"
+echo "     • Sign up: https://huggingface.co/settings/tokens"
 echo ""
-echo "  4) Mistral AI    — European AI, multilingual"
-echo "     Sign up at: https://console.mistral.ai"
+echo "  4) Mistral AI    — European AI, strong multilingual"
+echo "     • Speed: Good"
+echo "     • Quality: Very good"
+echo "     • Sign up: https://console.mistral.ai"
 echo ""
 echo "  5) Google AI     — Gemini 2.0 Flash free"
-echo "     Sign up at: https://aistudio.google.com/apikey"
+echo "     • Speed: Fast"
+echo "     • Quality: Excellent, with vision"
+echo "     • Sign up: https://aistudio.google.com/apikey"
 echo ""
-echo "  6) Local Ollama  — Run models on this machine"
+echo "  6) Local Ollama  — 🏠 Run models on this machine"
+echo "     • No internet required"
+echo "     • Privacy: All data stays local"
 echo ""
 echo "  7) LAN Remote    — Connect to Ollama on your network"
 echo ""
 
-read -rp "Enter choice [1-7]: " choice
+read -rp "Enter choice [1-7] (recommended: 1 for speed, 6 for privacy): " choice
 
 case "$choice" in
   1)
@@ -121,7 +150,21 @@ esac
 
 # Online provider setup
 echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Get your free API key at: ${SIGNUP}"
+echo ""
+
+if [[ "${PROVIDER}" == "groq" ]]; then
+  echo "📋 GROQ Quick Signup (2 minutes):"
+  echo "  1. Go to https://console.groq.com"
+  echo "  2. Sign up with Google, GitHub, or email"
+  echo "  3. Skip credit card (free tier doesn't need it)"
+  echo "  4. Click 'Create New API Key' in Settings"
+  echo "  5. Copy the key and paste it here"
+  echo ""
+  echo "💡 Tip: Keep your key private! You can regenerate it anytime."
+fi
+
 command -v xdg-open &>/dev/null && read -rp "Open in browser? [y/N]: " open_it
 [[ "${open_it:-n}" =~ ^[Yy]$ ]] && xdg-open "${SIGNUP}" &
 
@@ -130,7 +173,8 @@ read -rsp "Paste your ${PROVIDER} API key (input hidden): " api_key
 echo ""
 
 if [[ -z "$api_key" ]]; then
-  echo "No key entered. Aborting."
+  echo "❌ No key entered. Try again:"
+  echo "   Run: laia-setup-wizard"
   exit 1
 fi
 

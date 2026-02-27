@@ -1,114 +1,167 @@
-<div align="center">
+# LAIA Android — Phase 1 Status Report
 
-# LAIA
+**Project**: laiadandroid  
+**Repository**: https://github.com/laiadlotape/laiadandroid  
+**Status**: ⏳ IN PROGRESS — Phase 1 (Toolchain) ~60% complete  
+**Date**: 2026-02-26  
 
-**The AI-ready Linux distribution.**  
-Online free models · Local inference · LAN remote · Privacy-first
+---
 
-[![Build Status](https://github.com/laiadlotape/laia/actions/workflows/build-test.yml/badge.svg)](https://github.com/laiadlotape/laia/actions)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
-[![Debian Bookworm](https://img.shields.io/badge/base-Debian%20Bookworm-red.svg)](https://debian.org)
+## 🎯 Objective
 
-</div>
+Build the first functional version of LAIA for Android: a Flutter app that connects to Groq API for free AI chat.
 
-## What is LAIA?
+---
 
-LAIA is a Debian-based Linux distribution built around one idea: **AI should just work**, without requiring powerful hardware, expensive APIs, or complex setup.
+## ✅ What Works
 
-**Three ways to use AI with LAIA — choose what fits you:**
+### Flutter SDK
+- **Status**: ✅ Installed & Verified
+- **Version**: 3.27.4 stable
+- **Location**: `/home/mcflanagan/.openclaw/flutter/`
+- **Test**: `flutter --version` → SUCCESS
 
-| Mode | Setup time | Requirements | Best for |
-|------|-----------|--------------|----------|
-| ☁️ **Online Free** | 30 seconds | Free API key | Everyone — no hardware needed |
-| 🖥️ **Local** | 5–10 min | 4GB+ RAM | Privacy, offline use |
-| 🌐 **LAN Remote** | 10 seconds | Ollama on another machine | Home labs, shared servers |
+```
+Flutter 3.27.4 • channel stable
+Framework • revision d8a9f9a52e (1 year, 1 month ago)
+Engine • revision 82bd5b7209
+Tools • Dart 3.6.2 • DevTools 2.40.3
+```
 
-## Quick Start
+### Android SDK (Partial)
+- **Status**: ⏳ Downloaded but blocked
+- **Components Installed**:
+  - cmdline-tools v11076708 ✅ (extracted)
+  - Location: `/home/mcflanagan/.openclaw/android-sdk/cmdline-tools/latest/`
+- **Missing**: platform-tools, build-tools, platform SDKs (due to Java crash)
 
-### Option 1: Online Free (Recommended)
+---
 
-1. Get a free API key from [Groq](https://console.groq.com) — no credit card needed
-2. Install LAIA and run `laia-setup`
-3. Choose "Online Free" → "Groq" → paste your key
-4. Done — 300+ tokens/second, free
+## ❌ Blockers
 
-### Option 2: Local Inference
+### Java Runtime SIGBUS Error
+**Problem**: Java 21 crashes when executing Android SDK tools.
 
+```
+SIGBUS (0x7) at pc=0x00007f39a7d65413 in libc.so.6
+JRE version: 21.0.10+7-Debian-1
+```
+
+**Impact**:  
+- Cannot run `sdkmanager` to install SDK packages
+- Cannot proceed with Phase 2 (Android SDK configuration)
+
+**Quick Fix**:
 ```bash
-laia-setup  # choose "Local" → picks models based on your RAM
+# Install Java 17 (more stable)
+echo "estaes" | sudo -S apt-get install -y openjdk-17-jdk openjdk-17-jre
+
+# Update Flutter to use Java 17
+export PATH="/home/mcflanagan/.openclaw/flutter/bin:$PATH"
+flutter config --jdk-dir /usr/lib/jvm/java-17-openjdk-amd64
+
+# Verify
+flutter doctor
 ```
 
-### Option 3: LAN Remote
+---
 
+## 📊 System Specs
+
+| Resource | Value | Status |
+|----------|-------|--------|
+| Disk Free | 133 GB | ✅ OK |
+| RAM | 7.7 GB | ✅ OK |
+| Java Version | 21.0.10 | ❌ BROKEN (SIGBUS) |
+| Flutter | 3.27.4 | ✅ READY |
+
+---
+
+## 📋 Phases Roadmap
+
+| Phase | Task | Status | Notes |
+|-------|------|--------|-------|
+| 1.0 | Install Flutter SDK | ✅ DONE | 3.27.4 stable working |
+| 1.1 | Install Android SDK | ⏳ BLOCKED | Java crash on sdkmanager |
+| 1.2 | Configure Flutter doctor | ⏳ PENDING | Depends on 1.1 |
+| 2.0 | Create Flutter project | ⏸️ ON HOLD | Waiting for Phase 1 completion |
+| 3.0 | Implement chat UI | ⏸️ NOT STARTED | - |
+| 4.0 | Integrate Groq API | ⏸️ NOT STARTED | - |
+| 5.0 | Compile APK | ⏸️ NOT STARTED | - |
+| 6.0 | Setup emulator | ⏸️ NOT STARTED | - |
+| 7.0 | Write tests | ⏸️ NOT STARTED | - |
+| 8.0 | Configure CI/CD | ⏸️ NOT STARTED | - |
+| 9.0 | Document & commit | ⏸️ NOT STARTED | - |
+
+---
+
+## 🛠️ How to Resume
+
+### Option A: Install Java 17 (Recommended)
 ```bash
-laia-setup  # choose "LAN Remote" → enter your Ollama server IP
+# 1. Fix Java
+echo "estaes" | sudo -S apt-get install -y openjdk-17-jdk
+export PATH="/home/mcflanagan/.openclaw/flutter/bin:$PATH"
+flutter config --jdk-dir /usr/lib/jvm/java-17-openjdk-amd64
+
+# 2. Setup Android SDK
+export ANDROID_HOME="/home/mcflanagan/.openclaw/android-sdk"
+export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
+yes | sdkmanager --licenses
+sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+# 3. Verify
+flutter doctor
 ```
 
-## Free Online Providers
-
-| Provider | Speed | Free Models | Signup |
-|----------|-------|-------------|--------|
-| **Groq** ⭐ | 300–560 tok/sec | Llama 3.1 8B/70B, Gemma 2, Mixtral | [console.groq.com](https://console.groq.com) |
-| **OpenRouter** | Varies | 50+ free models (`:free` suffix) | [openrouter.ai](https://openrouter.ai) |
-| **HuggingFace** | Varies | 100k+ open models | [huggingface.co](https://huggingface.co) |
-| **Mistral AI** | Fast | Mistral 7B open | [console.mistral.ai](https://console.mistral.ai) |
-| **Google AI Studio** | Fast | Gemini 2.0 Flash | [aistudio.google.com](https://aistudio.google.com) |
-
-## Features
-
-- **Seamless provider switching** — change from Groq to local Ollama in one command
-- **OpenWebUI** — beautiful chat interface, works with all providers
-- **OpenClaw** — AI assistant integrated into the desktop (restrictive by default)
-- **Security-first** — AppArmor profiles, UFW rules, fail2ban, sysctl hardening
-- **Portable** — runs on x86_64 and ARM64 (Pi 4/5 friendly)
-- **Frictionless** — LAIA setup wizard gets you running in under 2 minutes
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│              User Applications               │
-│         OpenWebUI · OpenClaw · Apps         │
-├─────────────────────────────────────────────┤
-│              LAIA AI Router                  │
-│   (mode: online | local | lan)              │
-├──────────────┬──────────────┬───────────────┤
-│  Online Free │    Local     │  LAN Remote   │
-│  Groq/OR/HF  │   Ollama     │  Ollama/LMS   │
-│  /OpenAI API │  127.0.0.1   │  192.168.x.x  │
-└──────────────┴──────────────┴───────────────┘
-│              Debian Bookworm Base            │
-│              XFCE · Security Layer          │
-└─────────────────────────────────────────────┘
-```
-
-## Installation
-
+### Option B: Use Docker (Alternative)
 ```bash
-# Download and run installer
-curl -fsSL https://raw.githubusercontent.com/laiadlotape/laia/master/scripts/install.sh | sudo bash
-
-# Or clone and install
-git clone https://github.com/laiadlotape/laia
-cd laia && sudo bash scripts/install.sh
+docker pull flutter
+docker run -it -v $(pwd):/app flutter:latest flutter doctor
 ```
 
-## Configuration
+---
 
-```bash
-laia-setup          # First-time AI setup wizard
-laia-config         # GUI settings (GTK3)
-laia-test           # Test current AI connection
+## 📝 Files & Structure
+
+```
+/home/mcflanagan/.openclaw/laiadandroid/
+├── docs/
+│   └── SETUP_ISSUES.md          ← Detailed error log
+├── README.md                    ← This file
+└── android/                     ← Flutter project (to be created)
+    ├── lib/
+    │   ├── main.dart           ← App entry point
+    │   ├── config/
+    │   │   └── app_config.dart  ← API configuration
+    │   ├── models/
+    │   │   └── message.dart     ← Chat message model
+    │   ├── services/
+    │   │   └── ai_service.dart  ← Groq API client
+    │   └── screens/
+    │       ├── chat_screen.dart     ← Main chat UI
+    │       └── settings_screen.dart  ← API key config
+    ├── pubspec.yaml
+    └── build/                   ← Compiled APK (after Phase 5)
 ```
 
-## Docs
+---
 
-- [Installation Guide](docs/INSTALL.md)
-- [AI Models & Providers](docs/AI_MODELS.md)
-- [Security](docs/SECURITY.md)
-- [Build from source](docs/BUILD.md)
-- [Contributing](docs/CONTRIBUTING.md)
+## 💾 Cleanup Notes
 
-## License
+- Delete after verified: `/home/mcflanagan/.openclaw/flutter.tar.xz` (732 MB)
+- Delete after verified: `/tmp/cmdline-tools.zip` (147 MB)
 
-GPL-3.0 — see [LICENSE](LICENSE). Free to use, modify, and distribute.
+---
+
+## 🔗 Resources
+
+- [Flutter Linux Installation](https://flutter.dev/docs/get-started/install/linux)
+- [Android SDK Command-line Tools](https://developer.android.com/tools/releases/cmdline-tools)
+- [Groq API Console](https://console.groq.com) (free tier, no credit card needed)
+- [Java Versions](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+
+---
+
+**Next Milestone**: Fix Java → Install Android SDK → Create Flutter project → Implement chat UI
+

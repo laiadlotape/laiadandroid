@@ -1,3 +1,25 @@
+# Flutter & Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+*.apk
+*.ipa
+*.aar
+*.app
+*.appbundle
+*.exe
+*.zip
+
+# Generated files
+*.g.dart
+*.config.dart
+coverage/
+.coverage
+
 # Build artifacts
 build/output/
 build/*.iso
@@ -26,6 +48,8 @@ node_modules/
 *.swp
 *.swo
 *~
+*.iml
+*.sublime-*
 
 # OS
 .DS_Store
@@ -40,8 +64,13 @@ secrets/
 .env
 .env.*
 *.secret
+google-services.json
+google-services-release.json
 
 # Logs
 *.log
 logs/
 /var/log/
+
+# Local environment
+local.properties

@@ -1,167 +1,347 @@
-# LAIA Android — Phase 1 Status Report
+# LAIA Chat - Flutter Android App
 
-**Project**: laiadandroid  
-**Repository**: https://github.com/laiadlotape/laiadandroid  
-**Status**: ⏳ IN PROGRESS — Phase 1 (Toolchain) ~60% complete  
-**Date**: 2026-02-26  
+A lightweight, fast AI chat application powered by [Groq's API](https://groq.com), built with Flutter.
 
----
+**Features:**
+- ✨ Clean Material Design UI
+- 🚀 Blazing fast responses via Groq API
+- 💬 Real-time chat messaging
+- ⚙️ Easy API key configuration
+- 🔒 Secure (free tier, no credit card required)
+- 📱 Works on Android 5.0+
 
-## 🎯 Objective
+## Quick Start
 
-Build the first functional version of LAIA for Android: a Flutter app that connects to Groq API for free AI chat.
+### Prerequisites
 
----
+- **Flutter SDK** 3.6.2 or higher
+- **Android SDK** (API 21+)
+- **Groq API Key** (free - get it at [console.groq.com](https://console.groq.com))
 
-## ✅ What Works
+### 1. Get a Groq API Key
 
-### Flutter SDK
-- **Status**: ✅ Installed & Verified
-- **Version**: 3.27.4 stable
-- **Location**: `/home/mcflanagan/.openclaw/flutter/`
-- **Test**: `flutter --version` → SUCCESS
+1. Visit [console.groq.com](https://console.groq.com)
+2. Sign up (no credit card needed)
+3. Create an API key
+4. Copy your API key
 
-```
-Flutter 3.27.4 • channel stable
-Framework • revision d8a9f9a52e (1 year, 1 month ago)
-Engine • revision 82bd5b7209
-Tools • Dart 3.6.2 • DevTools 2.40.3
-```
+### 2. Clone & Setup
 
-### Android SDK (Partial)
-- **Status**: ⏳ Downloaded but blocked
-- **Components Installed**:
-  - cmdline-tools v11076708 ✅ (extracted)
-  - Location: `/home/mcflanagan/.openclaw/android-sdk/cmdline-tools/latest/`
-- **Missing**: platform-tools, build-tools, platform SDKs (due to Java crash)
-
----
-
-## ❌ Blockers
-
-### Java Runtime SIGBUS Error
-**Problem**: Java 21 crashes when executing Android SDK tools.
-
-```
-SIGBUS (0x7) at pc=0x00007f39a7d65413 in libc.so.6
-JRE version: 21.0.10+7-Debian-1
-```
-
-**Impact**:  
-- Cannot run `sdkmanager` to install SDK packages
-- Cannot proceed with Phase 2 (Android SDK configuration)
-
-**Quick Fix**:
 ```bash
-# Install Java 17 (more stable)
-echo "estaes" | sudo -S apt-get install -y openjdk-17-jdk openjdk-17-jre
-
-# Update Flutter to use Java 17
-export PATH="/home/mcflanagan/.openclaw/flutter/bin:$PATH"
-flutter config --jdk-dir /usr/lib/jvm/java-17-openjdk-amd64
-
-# Verify
-flutter doctor
+git clone https://github.com/laiadlotape/laiadandroid.git
+cd laiadandroid
+flutter pub get
 ```
 
----
+### 3. Run the App
 
-## 📊 System Specs
-
-| Resource | Value | Status |
-|----------|-------|--------|
-| Disk Free | 133 GB | ✅ OK |
-| RAM | 7.7 GB | ✅ OK |
-| Java Version | 21.0.10 | ❌ BROKEN (SIGBUS) |
-| Flutter | 3.27.4 | ✅ READY |
-
----
-
-## 📋 Phases Roadmap
-
-| Phase | Task | Status | Notes |
-|-------|------|--------|-------|
-| 1.0 | Install Flutter SDK | ✅ DONE | 3.27.4 stable working |
-| 1.1 | Install Android SDK | ⏳ BLOCKED | Java crash on sdkmanager |
-| 1.2 | Configure Flutter doctor | ⏳ PENDING | Depends on 1.1 |
-| 2.0 | Create Flutter project | ⏸️ ON HOLD | Waiting for Phase 1 completion |
-| 3.0 | Implement chat UI | ⏸️ NOT STARTED | - |
-| 4.0 | Integrate Groq API | ⏸️ NOT STARTED | - |
-| 5.0 | Compile APK | ⏸️ NOT STARTED | - |
-| 6.0 | Setup emulator | ⏸️ NOT STARTED | - |
-| 7.0 | Write tests | ⏸️ NOT STARTED | - |
-| 8.0 | Configure CI/CD | ⏸️ NOT STARTED | - |
-| 9.0 | Document & commit | ⏸️ NOT STARTED | - |
-
----
-
-## 🛠️ How to Resume
-
-### Option A: Install Java 17 (Recommended)
 ```bash
-# 1. Fix Java
-echo "estaes" | sudo -S apt-get install -y openjdk-17-jdk
-export PATH="/home/mcflanagan/.openclaw/flutter/bin:$PATH"
-flutter config --jdk-dir /usr/lib/jvm/java-17-openjdk-amd64
+# On emulator
+flutter run
 
-# 2. Setup Android SDK
-export ANDROID_HOME="/home/mcflanagan/.openclaw/android-sdk"
-export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
-yes | sdkmanager --licenses
-sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-
-# 3. Verify
-flutter doctor
+# On physical device
+flutter run
 ```
 
-### Option B: Use Docker (Alternative)
+### 4. Configure API Key
+
+1. Open the app
+2. Tap **Settings** (⚙️)
+3. Paste your Groq API key
+4. Tap **Validate API Key**
+5. Tap **Save API Key**
+
+### 5. Start Chatting!
+
+Tap the message input field and start talking to LAIA.
+
+---
+
+## Available AI Models
+
+The app includes access to these Groq-hosted models (free tier):
+
+| Model | Size | Speed | Best For |
+|-------|------|-------|----------|
+| **Mixtral 8x7B** | 8x7B MoE | ⚡⚡⚡ Very Fast | General chat, coding, creative tasks |
+| **Llama 2 70B** | 70B | ⚡⚡ Fast | Complex reasoning, detailed answers |
+| **Gemma 7B** | 7B | ⚡⚡⚡ Fastest | Quick responses, efficient |
+
+**Model is fixed to Mixtral 8x7B in this version.** To change models, edit `lib/config/app_config.dart`:
+
+```dart
+static const String defaultModel = 'mixtral-8x7b-32768';  // Change this line
+```
+
+Rebuild with `flutter run`.
+
+---
+
+## Project Structure
+
+```
+lib/
+├── main.dart                 # App entry point
+├── screens/
+│   ├── chat_screen.dart     # Main chat UI
+│   └── settings_screen.dart # API key configuration
+├── services/
+│   └── ai_service.dart      # Groq API integration
+├── models/
+│   └── message.dart         # Message data model
+└── config/
+    └── app_config.dart      # App configuration & constants
+    
+test/
+├── services/
+│   └── ai_service_test.dart # Unit tests for AI service
+├── screens/
+│   └── chat_screen_test.dart # Widget tests for chat UI
+└── widget_test.dart         # Basic widget test
+
+android/                      # Android-specific configuration
+ios/                         # iOS configuration (not configured)
+```
+
+---
+
+## Configuration
+
+### API Configuration (`lib/config/app_config.dart`)
+
+```dart
+class AppConfig {
+  static const String groqApiUrl = 'https://api.groq.com/openai/v1';
+  static const String defaultModel = 'mixtral-8x7b-32768';
+  static const int maxTokens = 1024;        // Max response length
+  static const double temperature = 0.7;    // Creativity (0.0-2.0)
+  static const int requestTimeoutSeconds = 30;
+}
+```
+
+**Tweak these to customize behavior:**
+- **maxTokens**: Increase for longer responses (uses more API quota)
+- **temperature**: Lower (0.0) = more focused, Higher (2.0) = more creative
+- **requestTimeoutSeconds**: Increase if you have slow internet
+
+---
+
+## Building for Release
+
+### APK (Android)
+
 ```bash
-docker pull flutter
-docker run -it -v $(pwd):/app flutter:latest flutter doctor
+# Generate release APK
+flutter build apk --release
+
+# Output: build/app/outputs/apk/release/app-release.apk
+# File size: ~50-70 MB
+```
+
+### AAB (Google Play)
+
+```bash
+flutter build appbundle --release
+# Output: build/app/outputs/bundle/release/app-release.aab
 ```
 
 ---
 
-## 📝 Files & Structure
+## Testing
 
-```
-/home/mcflanagan/.openclaw/laiadandroid/
-├── docs/
-│   └── SETUP_ISSUES.md          ← Detailed error log
-├── README.md                    ← This file
-└── android/                     ← Flutter project (to be created)
-    ├── lib/
-    │   ├── main.dart           ← App entry point
-    │   ├── config/
-    │   │   └── app_config.dart  ← API configuration
-    │   ├── models/
-    │   │   └── message.dart     ← Chat message model
-    │   ├── services/
-    │   │   └── ai_service.dart  ← Groq API client
-    │   └── screens/
-    │       ├── chat_screen.dart     ← Main chat UI
-    │       └── settings_screen.dart  ← API key config
-    ├── pubspec.yaml
-    └── build/                   ← Compiled APK (after Phase 5)
+### Run All Tests
+
+```bash
+flutter test
 ```
 
----
+### Run Specific Test File
 
-## 💾 Cleanup Notes
+```bash
+flutter test test/services/ai_service_test.dart
+flutter test test/screens/chat_screen_test.dart
+```
 
-- Delete after verified: `/home/mcflanagan/.openclaw/flutter.tar.xz` (732 MB)
-- Delete after verified: `/tmp/cmdline-tools.zip` (147 MB)
+### Generate Coverage Report
 
----
-
-## 🔗 Resources
-
-- [Flutter Linux Installation](https://flutter.dev/docs/get-started/install/linux)
-- [Android SDK Command-line Tools](https://developer.android.com/tools/releases/cmdline-tools)
-- [Groq API Console](https://console.groq.com) (free tier, no credit card needed)
-- [Java Versions](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+```bash
+flutter test --coverage
+# Report: coverage/lcov.info
+```
 
 ---
 
-**Next Milestone**: Fix Java → Install Android SDK → Create Flutter project → Implement chat UI
+## Troubleshooting
 
+### "API key not configured"
+
+**Problem:** App says "Please configure your Groq API key in settings"
+
+**Solution:**
+1. Open Settings (⚙️)
+2. Paste your API key from [console.groq.com](https://console.groq.com)
+3. Tap "Validate API Key" - wait for ✓
+4. Tap "Save API Key"
+
+### "Invalid API key"
+
+**Problem:** Validation fails with "Invalid API key"
+
+**Solution:**
+1. Double-check your key is copied completely (no extra spaces)
+2. Verify the key is from [console.groq.com](https://console.groq.com), not another service
+3. Try generating a new key in Groq Console
+4. Check your internet connection
+
+### "Rate limit exceeded"
+
+**Problem:** "Rate limit exceeded. Please wait and try again."
+
+**Solution:**
+- Groq free tier has rate limits. Wait a few seconds and retry.
+- Premium tier available at [console.groq.com](https://console.groq.com)
+
+### "Network timeout"
+
+**Problem:** "API request timeout"
+
+**Solution:**
+1. Check your internet connection
+2. Increase timeout in `lib/config/app_config.dart`:
+   ```dart
+   static const int requestTimeoutSeconds = 60; // increased from 30
+   ```
+3. Rebuild: `flutter run`
+
+### App crashes on startup
+
+**Problem:** App won't start or crashes immediately
+
+**Solution:**
+```bash
+# Clean build
+flutter clean
+flutter pub get
+flutter run
+
+# If still broken, check logs:
+flutter run -v
+```
+
+### Emulator connection issues
+
+**Problem:** "Device not found" when running `flutter run`
+
+**Solution:**
+```bash
+# List available devices
+flutter devices
+
+# Start emulator if not running
+emulator -avd <emulator_name>
+
+# Then run
+flutter run
+```
+
+---
+
+## Development
+
+### Code Style
+
+This project follows:
+- [Effective Dart](https://dart.dev/guides/language/effective-dart) conventions
+- Flutter [Analysis Options](analysis_options.yaml)
+
+Run linter:
+```bash
+flutter analyze
+```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+---
+
+## CI/CD
+
+This project includes GitHub Actions workflows:
+
+- **Flutter Build**: Runs on every push to master
+  - Analyzes code
+  - Runs tests
+  - Builds APK
+  - Stores APK as artifact
+
+View in `.github/workflows/flutter-build.yml`
+
+---
+
+## Performance Tips
+
+1. **Use Mixtral 8x7B** (default) for best speed/quality balance
+2. **Lower maxTokens** for faster responses:
+   ```dart
+   static const int maxTokens = 512; // instead of 1024
+   ```
+3. **Keep temperature around 0.7** for balanced responses
+4. **Use Wi-Fi** instead of cellular for better performance
+
+---
+
+## Privacy & Security
+
+- 🔒 **Your API key** is stored locally in the app's secure storage
+- 🌐 **Messages** are sent to Groq's servers (check [Groq Privacy Policy](https://groq.com/privacy))
+- ✅ **No tracking** - this app has no analytics or telemetry
+- 📱 **Android only** - iOS support can be added
+
+---
+
+## License
+
+MIT License - See `LICENSE` file
+
+---
+
+## Support
+
+**Issues?** Check the [Troubleshooting](#troubleshooting) section above.
+
+**Groq API Issues?** Contact [Groq Support](https://groq.com/support)
+
+**Found a bug?** Open an issue on [GitHub](https://github.com/laiadlotape/laiadandroid/issues)
+
+---
+
+## What's Next?
+
+Potential improvements:
+- [ ] Message persistence (save chat history)
+- [ ] Multiple chat sessions
+- [ ] Image generation
+- [ ] Voice input/output
+- [ ] Dark mode
+- [ ] Model selection in UI
+- [ ] Conversation export
+- [ ] iOS support
+
+---
+
+## Credits
+
+- **[Groq](https://groq.com)** - Fast, open-source LLMs
+- **[Flutter](https://flutter.dev)** - Beautiful native apps
+- **[Material Design 3](https://m3.material.io/)** - Design system
+
+---
+
+**Made with ❤️ by [@laiadlotape](https://github.com/laiadlotape)**
+
+Last updated: 2026-02-27

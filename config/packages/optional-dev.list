@@ -1,0 +1,10 @@
+# Developer tools — opt-in during setup wizard
+build-essential
+gcc
+make
+pkg-config
+libssl-dev
+docker.io
+docker-compose-plugin
+nodejs
+npm

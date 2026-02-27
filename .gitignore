@@ -1,0 +1,47 @@
+# Build artifacts
+build/output/
+build/*.iso
+build/*.img
+*.iso
+*.img
+build/chroot/
+build/binary/
+build/cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/lib/
+
+# Node
+node_modules/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — NEVER commit these
+*.key
+*.pem
+*.p12
+config/openclaw/openclaw.json
+secrets/
+.env
+.env.*
+*.secret
+
+# Logs
+*.log
+logs/
+/var/log/

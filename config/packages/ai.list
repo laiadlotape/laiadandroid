@@ -1,0 +1,13 @@
+# LAIA AI Stack packages
+# Ollama is installed via its own script (not apt)
+# This list covers system dependencies
+
+curl
+ca-certificates
+python3
+python3-pip
+python3-venv
+
+# GPU acceleration (auto-detected by install script)
+# nvidia-container-toolkit  -- only if NVIDIA GPU present
+# mesa-vulkan-drivers       -- AMD/Intel GPU

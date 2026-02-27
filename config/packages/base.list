@@ -1,0 +1,62 @@
+# LAIA Base Package List — one package per line, # = comment
+
+## Desktop Environment (lightweight, Windows-familiar)
+xfce4
+xfce4-goodies
+lightdm
+lightdm-gtk-greeter
+
+## Terminal & Shell
+bash
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+tmux
+curl
+wget
+git
+vim
+nano
+
+## System Utilities
+htop
+btop
+ncdu
+tree
+unzip
+zip
+p7zip-full
+rsync
+lsof
+
+## Network
+network-manager
+network-manager-gnome
+openssh-client
+openssh-server
+ufw
+fail2ban
+
+## Security
+apparmor
+apparmor-utils
+apparmor-profiles
+apparmor-profiles-extra
+libpam-pwquality
+unattended-upgrades
+lynis
+
+## Python (for LAIA GUI tools)
+python3
+python3-pip
+python3-venv
+python3-gi
+gir1.2-gtk-3.0
+gir1.2-notify-0.7
+
+## System
+dbus
+polkit
+sudo
+cron
+logrotate
